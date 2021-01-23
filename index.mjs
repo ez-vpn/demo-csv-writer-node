@@ -11,21 +11,21 @@ const config = {
     csvPath: process.env.CSV_PATH ?? "/tmp/log.csv"
 };
 
-const saveToCsv = async (data) => {
+const saveToCsv = async data => {
     return new Promise((resolve, reject) => {
         const csv = new objectsToCsv([data]);
         csv.toDisk(config.csvPath, { append: true })
             .then(() => {
                 resolve();
             })
-            .catch((error) => {
+            .catch(error => {
                 console.error("csv write failed", error);
                 reject();
             });
     });
 };
 
-const mqttBrokerSetup = (messageHandler) => {
+const mqttBrokerSetup = messageHandler => {
     console.log(`Connecting to mqtt broker at ${config.mqttHost}:${config.mqttPort}`);
 
     const mqttClient = mqtt.connect(`mqtt://${config.mqttHost}:${config.mqttPort}`, {
@@ -56,7 +56,7 @@ const messageParser = (topic, message) => {
     // extract protocol and measurement
     const topicRegexp = /^([^\/]+)\/([^\/]+)\/{0,1}.*\/([^\/]+)$/;
     const match = topicRegexp.exec(topic);
-    if (match.length < 4) {
+    if (!match || match.length < 4) {
         console.error("bad topic, cannot extract protocol");
         throw new Error("bad topic, cannot extract protocol");
     }
